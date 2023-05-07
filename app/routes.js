@@ -1,6 +1,20 @@
 module.exports = function(app, passport, db) {
 const ObjectId = require('mongodb').ObjectID
+const multer = require('multer');
+const path = require('path')
 // normal routes ===============================================================
+// configure multer to store uploaded files in the "uploads" directory
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function(req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ storage: storage });
 
     // show the home page (will also have our login links)
     app.get('/', function(req, res) {
@@ -28,8 +42,9 @@ const ObjectId = require('mongodb').ObjectID
 
 // message board routes ===============================================================
 
-    app.post('/movies', (req, res) => {
-      db.collection('allMovies').save({movieName: req.body.movieName, img: req.body.img, year: req.body.year, description: req.body.description, yourRating: req.body.yourRating}, (err, result) => {
+    app.post('/movies', upload.single('img'), (req, res) => {
+      const file = req.file;
+      db.collection('allMovies').insertOne({userId: req.user._id,movieName: req.body.movieName, img: req.body.img, year: req.body.year, description: req.body.description, yourRating: req.body.yourRating, imgName: file.originalname, imgPath: file.path + '.jpg'}, (err, result) => {
         if (err) return console.log(err)
         console.log('saved to database')
         res.redirect('/profile')
@@ -53,12 +68,20 @@ const ObjectId = require('mongodb').ObjectID
     })
     
   
+    // app.delete('/movies', (req, res) => {
+    //   db.collection('allMovies').findOneAndDelete({movieName: req.body.movieName, year: req.body.year, description: req.body.description, yourRating: req.body.yourRating}, (err, result) => {
+    //     if (err) return res.send(500, err)
+    //     res.send('Message deleted!')
+    //   })
+    // })
+
     app.delete('/movies', (req, res) => {
-      db.collection('allMovies').findOneAndDelete({movieName: req.body.movieName, year: req.body.year, description: req.body.description, yourRating: req.body.yourRating}, (err, result) => {
-        if (err) return res.send(500, err)
-        res.send('Message deleted!')
-      })
-    })
+      db.collection('allMovies').findOneAndDelete({movieName: req.body.movieName, img: req.body.img, year: req.body.year, description: req.body.description, yourRating: req.body.yourRating}, (err, result) => {
+        if (err) return res.send(500, err);
+        res.send('Movie deleted!');
+      });
+    });
+    
 
 // =============================================================================
 // AUTHENTICATE (FIRST LOGIN) ==================================================

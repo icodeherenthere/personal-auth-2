@@ -8,53 +8,64 @@
 </head>
 <body>
 <div class="container">
-
-    <div class="page-header text-center">
-        <h1>Profile Page</h1>
-        <a href="/logout" class="btn btn-default btn-sm">Logout</a>
-    </div>
-
-    <div class="row">
-
-        <!-- LOCAL INFORMATION -->
-        <!-- <div class="col-sm-6">
-            <div class="well">
-                <h3><span class="fa fa-user"></span> Local</h3>
-
-                <% if (user.local.email) { %>
-                    <p>
-                        <strong>id</strong>: <%= user._id %><br>
-                        <strong>email</strong>: <%= user.local.email %><br>
-                        <strong>password</strong>: <%= user.local.password %>
-                    </p>
-
-                    <a href="/unlink/local" class="btn btn-default">Unlink</a>
-                <% } else { %>
-                    <a href="/connect/local" class="btn  btn-default">Connect Local</a>
-                <% } %>
-
-            </div>
-        </div> -->
-        <div>
-          <h3>Movie List</h3>
-          <ul class="movies">
-          <% for(var i=0; i<movies.length; i++) {%>
-            <li id="everything">
-              <span><%= movies[i].movieName %></span>
-              <span><img src="img/movies/<%= movies[i].img %>">
-              <h3 class="one"><%= movies[i].year %></>
-              <span class="one"><%= movies[i].description %></span>
-              <h3 class="one">Rating <%= movies[i].yourRating %></h3>
-
-              <h3><input class="rate" placeholder="0-10" id="<%= movies[i]._id %>"></h3>
-              <span><button class="rateBtn" data-movieId="<%= movies[i]._id %>">"Rate"</button></span>
-              <span><button class="seenIt">"Seen It"</button></span>
-            </li>
-          <% } %>
-          </ul>
+    <div class="container">
+        <div class="page-header text-center">
+          <h1>Profile Page</h1>
+          <a href="/logout" class="btn btn-primary btn-sm">Logout</a>
         </div>
-</div>
-
+      
+        <div class="row justify-content-center">
+          <div class="col-md-8">
+            <h3 class="text-center">Movie List</h3>
+            <ul class="list-group">
+              <% for(var i=0; i<movies.length; i++) {%>
+              <li class="list-group-item">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <% let imgPath = movies[i].img
+                    if(! imgPath && movies[i].imgPath){
+                        const imgArr = movies[i].imgPath.split('/')
+                        imgArr.shift()
+                        imgPath = imgArr.join('/')
+                    }else{
+                        imgPath = 'img/movies/' + imgPath
+                    }%>
+                    <img src="<%= imgPath %>" class="img-fluid">
+                  </div>
+                  <div class="col-sm-8">
+                    <h4><%= movies[i].movieName %> (<%= movies[i].year %>)</h4>
+                    <p><%= movies[i].description %></p>
+                    <h5>Rating: <%= movies[i].yourRating %></h5>
+                    <div class="input-group mb-3">
+                      <input type="number" class="form-control" max="10" min="0" placeholder="0-10" id="<%= movies[i]._id %>">
+                      <div class="input-group-append">
+                        <button class="btn btn-primary rateBtn" type="button" data-movieId="<%= movies[i]._id %>">Rate</button>
+                      </div>
+                    </div>
+                    <% if(movies[i].userId && user._id.toString() === movies[i].userId.toString()){ %>
+                    <button class="btn btn-secondary seenIt" data-movieDescription="<%= movies[i].description %>" data-yourRating = "<%= movies[i].yourRating %>" data-movieName="<%= movies[i].movieName %>" data-year="<%= movies[i].year %>">Delete</button>
+                    <% } %>
+                  </div>
+                </div>
+              </li>
+              <% } %>
+            </ul>
+            <% if (user.local.email) { %>
+                <form action="/movies" method="POST" enctype="multipart/form-data">
+                    <span>Image</span>
+                    <input type="file" name="img">
+                  <input type="text" value="" name="movieName">
+                  <input type="number" max="10" min="0" placeholder="Rating" name="yourRating">
+                  <input type="text" placeholder="description" name="description">
+                  <input type="number" placeholder="year" name="year">
+                  <button type="submit">Submit</button>
+                </form>
+              </div>
+              <% } %>
+          </div>
+        </div>
+      </div>
+      
 <script src="main.js"></script>
 
 </body>
