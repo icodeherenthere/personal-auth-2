@@ -1,5 +1,9 @@
+body{
+  background-color: #010e0f;
+}
+
 .container {
-  background-color: #f9f9f9;
+  
   padding: 30px;
   margin: 50px auto;
   max-width: 1200px;
@@ -10,7 +14,7 @@
   }
   
   .page-header h1 {
-  color: #333;
+  /* color: #333; */
   }
   
   .btn-primary {

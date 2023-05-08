@@ -6,7 +6,7 @@ const path = require('path')
 // configure multer to store uploaded files in the "uploads" directory
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    cb(null, 'uploads/');
+    cb(null, 'public/uploads/'); // added public
   },
   filename: function(req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -42,14 +42,14 @@ const upload = multer({ storage: storage });
 
 // message board routes ===============================================================
 
-    app.post('/movies', upload.single('img'), (req, res) => {
-      const file = req.file;
-      db.collection('allMovies').insertOne({userId: req.user._id,movieName: req.body.movieName, img: req.body.img, year: req.body.year, description: req.body.description, yourRating: req.body.yourRating, imgName: file.originalname, imgPath: file.path + '.jpg'}, (err, result) => {
-        if (err) return console.log(err)
-        console.log('saved to database')
-        res.redirect('/profile')
-      })
-    })
+app.post('/movies', upload.single('img'), (req, res) => {
+  const file = req.file;
+  db.collection('allMovies').insertOne({userId: req.user._id,movieName: req.body.movieName, img: req.body.img, year: req.body.year, description: req.body.description, yourRating: req.body.yourRating, imgName: file.originalname, imgPath: file.path}, (err, result) => {
+    if (err) return console.log(err)
+    console.log('saved to database')
+    res.redirect('/profile')
+  })
+})
 
     app.put('/movies', (req, res) => {
       console.log(req.body)
@@ -76,7 +76,7 @@ const upload = multer({ storage: storage });
     // })
 
     app.delete('/movies', (req, res) => {
-      db.collection('allMovies').findOneAndDelete({movieName: req.body.movieName, img: req.body.img, year: req.body.year, description: req.body.description, yourRating: req.body.yourRating}, (err, result) => {
+      db.collection('allMovies').findOneAndDelete({_id: ObjectId(req.body.movieid)}, (err, result) => {
         if (err) return res.send(500, err);
         res.send('Movie deleted!');
       });

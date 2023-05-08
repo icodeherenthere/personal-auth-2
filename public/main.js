@@ -28,20 +28,18 @@ Array.from(rateBtns).forEach(function(btn) {
 
 Array.from(seenIt).forEach(function(element) {
   element.addEventListener('click', function(){
-    const movieName = this.dataset.movieName;
-    const description = this.dataset.description;
-    const yourRating = this.dataset.yourRating;
-    const year = this.dataset.year;
-    fetch(`movies`, {
-      method: 'DELETE',
+    // const movieName = this.dataset.movieName;
+    // const description = this.dataset.description;
+    // const yourRating = this.dataset.yourRating;
+    // const year = this.dataset.year;
+    const movieid = btn.dataset.movieid
+    fetch('movies', {
+      method: 'delete',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        'movieName' : movieName,
-        'description' : description,
-        'yourRating' : yourRating,
-        'year' : year
+        'movieid': movieid,
         
       })
     }).then(function (response) {
